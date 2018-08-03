@@ -34,9 +34,6 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void preInit(FMLPreInitializationEvent e) {
 		super.preInit(e);
-		//ModItems.preInitModels();
-		//ModKeybindings.preInit();
-		//ModCreativeTab.preInit();
 	}
 
 	@Override
@@ -46,7 +43,6 @@ public class ClientProxy extends CommonProxy {
 
 	@Override
 	public void postInit(FMLPostInitializationEvent e) {
-		//ModIntegration.postInit();
 		super.postInit(e);
 	}
 
