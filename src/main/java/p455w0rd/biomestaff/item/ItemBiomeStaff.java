@@ -22,6 +22,7 @@ import javax.annotation.Nullable;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -31,6 +32,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.translation.I18n;
@@ -45,6 +47,7 @@ import p455w0rd.biomestaff.init.ModGlobals;
 import p455w0rd.biomestaff.init.ModNetworking;
 import p455w0rd.biomestaff.network.PacketSyncBiomeStaff;
 import p455w0rd.biomestaff.network.PacketUpdateChunkRender;
+import p455w0rd.biomestaff.util.BiomeStaffUtil;
 
 /**
  * @author p455w0rd
@@ -59,11 +62,21 @@ public class ItemBiomeStaff extends Item {
 	public ItemBiomeStaff() {
 		setUnlocalizedName(REGISTRY_NAME.getResourcePath().toString());
 		setRegistryName(REGISTRY_NAME);
+		setHasSubtypes(true);
+		setCreativeTab(CreativeTabs.TOOLS);
+	}
+
+	@Override
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
+		if (isInCreativeTab(tab)) {
+			items.add(new ItemStack(this));
+			items.addAll(BiomeStaffUtil.getAllBiomeStaffs());
+		}
 	}
 
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-		if (!world.isRemote || hand != EnumHand.MAIN_HAND) {
+		if (!world.isRemote && hand == EnumHand.MAIN_HAND && player.isSneaking()) {
 			ItemStack heldStack = player.getHeldItemMainhand();
 			if (heldStack.hasTagCompound()) {
 				NBTTagCompound nbt = heldStack.getTagCompound();
@@ -117,7 +130,6 @@ public class ItemBiomeStaff extends Item {
 					}
 					ModNetworking.getInstance().sendTo(new PacketUpdateChunkRender(pos, rad, biome), (EntityPlayerMP) player);
 				}
-				return player.isSneaking() ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
 			}
 		}
 		return EnumActionResult.SUCCESS;
@@ -147,7 +159,15 @@ public class ItemBiomeStaff extends Item {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public String getItemStackDisplayName(ItemStack stack) {
-		return I18n.translateToLocal(stack.getItem().getUnlocalizedName() + ".name").trim();
+		String biomeName = "";
+		Biome biome = BiomeStaffUtil.getBiomeFromStaff(stack);
+		if (biome != null) {
+			biomeName = biome.getBiomeName();
+			if (biomeName != null && !biomeName.isEmpty()) {
+				biomeName = " - " + biomeName;
+			}
+		}
+		return I18n.translateToLocal(stack.getItem().getUnlocalizedName() + ".name").trim() + "" + biomeName;
 	}
 
 	@SideOnly(Side.CLIENT)

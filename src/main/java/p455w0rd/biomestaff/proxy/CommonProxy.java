@@ -16,9 +16,12 @@
  */
 package p455w0rd.biomestaff.proxy;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import p455w0rd.biomestaff.init.ModConfig;
 import p455w0rd.biomestaff.init.ModNetworking;
 
 /**
@@ -28,6 +31,7 @@ import p455w0rd.biomestaff.init.ModNetworking;
 public class CommonProxy {
 
 	public void preInit(FMLPreInitializationEvent e) {
+		ModConfig.init();
 		ModNetworking.init();
 	}
 
@@ -38,6 +42,14 @@ public class CommonProxy {
 	}
 
 	public void updateChunkRendering(int x, int z) {
+	}
+
+	public World getWorld() {
+		return null;
+	}
+
+	public EntityPlayer getPlayer() {
+		return null;
 	}
 
 }

@@ -19,8 +19,13 @@ package p455w0rd.biomestaff.util;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import p455w0rd.biomestaff.init.ModItems;
 import p455w0rd.biomestaff.item.ItemBiomeStaff;
 
 /**
@@ -44,11 +49,27 @@ public class BiomeStaffUtil {
 	}
 
 	public static IBlockState getBiomeTopBlockFromStaff(ItemStack staff) {
+		IBlockState returnBlock = Blocks.AIR.getDefaultState();
 		if (doesStaffContainBiome(staff)) {
 			Biome biome = getBiomeFromStaff(staff);
-			return biome.topBlock;
+			ResourceLocation regName = biome.getRegistryName();
+			if (regName.getResourceDomain().equals("minecraft")) {
+				String path = regName.getResourcePath();
+				if (path.equals("hell")) {
+					returnBlock = Blocks.NETHERRACK.getDefaultState();
+				}
+				else if (path.equals("mushroom_island") || path.equals("mushroom_island_shore")) {
+					returnBlock = Blocks.RED_MUSHROOM.getDefaultState();
+				}
+				else if (path.equals("birch_forest") || path.equals("birch_forest_hills") || path.equals("mutated_birch_forest") || path.equals("mutated_birch_forest_hills")) {
+					returnBlock = Blocks.LOG.getStateFromMeta(2);
+				}
+				else {
+					returnBlock = biome.topBlock;
+				}
+			}
 		}
-		return Blocks.AIR.getDefaultState();
+		return returnBlock;
 	}
 
 	public static ItemStack getItemTopBlockStack(ItemStack staff) {
@@ -57,6 +78,27 @@ public class BiomeStaffUtil {
 			return biomeTopBlockState.getBlock().getPickBlock(biomeTopBlockState, null, null, null, null);
 		}
 		return ItemStack.EMPTY;
+	}
+
+	public static NonNullList<ItemStack> getAllBiomeStaffs() {
+		NonNullList<ItemStack> staffList = NonNullList.create();
+		for (Biome biome : ForgeRegistries.BIOMES.getValues()) {
+			staffList.add(getStaffForBiome(biome));
+		}
+		return staffList;
+	}
+
+	public static ItemStack getStaffForBiome(Biome biome) {
+		ItemStack staff = new ItemStack(ModItems.BIOME_STAFF);
+		staff.setTagCompound(createTagForBiome(biome));
+		return staff;
+	}
+
+	public static NBTTagCompound createTagForBiome(Biome biome) {
+		NBTTagCompound tag = new NBTTagCompound();
+		byte biomeId = (byte) Biome.getIdForBiome(biome);
+		tag.setByte(ItemBiomeStaff.TAG_BIOME, biomeId);
+		return tag;
 	}
 
 }

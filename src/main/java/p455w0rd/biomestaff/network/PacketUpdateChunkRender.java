@@ -17,7 +17,6 @@
 package p455w0rd.biomestaff.network;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -49,7 +48,7 @@ public class PacketUpdateChunkRender implements IMessage, IMessageHandler<Packet
 	public IMessage onMessage(PacketUpdateChunkRender message, MessageContext ctx) {
 		int rad = message.radius;
 		BlockPos pos = message.pos;
-		World world = Minecraft.getMinecraft().world;
+		World world = BiomeStaff.PROXY.getWorld();
 		for (int x = pos.getX() - rad; x <= pos.getX() + rad; ++x) {
 			for (int z = pos.getZ() - rad; z <= pos.getZ() + rad; ++z) {
 				int relBlockX = x & 15;

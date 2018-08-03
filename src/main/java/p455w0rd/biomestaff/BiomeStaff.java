@@ -30,7 +30,7 @@ import p455w0rd.biomestaff.proxy.CommonProxy;
  * @author p455w0rd
  *
  */
-@Mod(modid = ModGlobals.MODID, name = ModGlobals.NAME, version = ModGlobals.VERSION, dependencies = ModGlobals.DEP_LIST, acceptedMinecraftVersions = "[1.12.2]")
+@Mod(modid = ModGlobals.MODID, name = ModGlobals.NAME, version = ModGlobals.VERSION, guiFactory = ModGlobals.GUI_FACTORY, dependencies = ModGlobals.DEP_LIST, acceptedMinecraftVersions = "[1.12.2]")
 public class BiomeStaff {
 
 	@SidedProxy(clientSide = ModGlobals.CLIENT_PROXY, serverSide = ModGlobals.SERVER_PROXY)

@@ -17,7 +17,6 @@
 package p455w0rd.biomestaff.network;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
@@ -25,6 +24,7 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import p455w0rd.biomestaff.BiomeStaff;
 
 /**
  * @author p455w0rd
@@ -43,9 +43,9 @@ public class PacketSyncBiomeStaff implements IMessage, IMessageHandler<PacketSyn
 
 	@Override
 	public IMessage onMessage(PacketSyncBiomeStaff message, MessageContext ctx) {
-		ItemStack heldStack = Minecraft.getMinecraft().player.getHeldItemMainhand();
+		ItemStack heldStack = BiomeStaff.PROXY.getPlayer().getHeldItemMainhand();
 		heldStack.deserializeNBT(nbt);
-		Minecraft.getMinecraft().player.setHeldItem(EnumHand.MAIN_HAND, heldStack);
+		BiomeStaff.PROXY.getPlayer().setHeldItem(EnumHand.MAIN_HAND, heldStack);
 		return null;
 	}
 

@@ -16,17 +16,40 @@
  */
 package p455w0rd.biomestaff.init;
 
-public class ModGlobals {
+import java.util.Set;
 
-	public static final String MODID = "biomestaff";
-	public static final String VERSION = "1.0.0";
-	public static final String NAME = "BoimeStaff";
-	public static final String SERVER_PROXY = "p455w0rd.biomestaff.proxy.CommonProxy";
-	public static final String CLIENT_PROXY = "p455w0rd.biomestaff.proxy.ClientProxy";
-	public static final String GUI_FACTORY = "p455w0rd.biomestaff.init.ModGuiFactory";
-	public static final String DEP_LIST = "";
-	public static final String CONFIG_FILE = "config/BiomeStaff.cfg";
+import javax.annotation.Nullable;
 
-	public static int staffAnimationTicker = 0;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraftforge.fml.client.IModGuiFactory;
+import p455w0rd.biomestaff.client.gui.GuiModConfig;
+
+/**
+ * @author p455w0rd
+ *
+ */
+public class ModGuiFactory implements IModGuiFactory {
+
+	@Override
+	public void initialize(Minecraft minecraftInstance) {
+
+	}
+
+	@Override
+	public boolean hasConfigGui() {
+		return true;
+	}
+
+	@Override
+	public GuiScreen createConfigGui(GuiScreen parentScreen) {
+		return new GuiModConfig(parentScreen);
+	}
+
+	@Nullable
+	@Override
+	public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
+		return null;
+	}
 
 }

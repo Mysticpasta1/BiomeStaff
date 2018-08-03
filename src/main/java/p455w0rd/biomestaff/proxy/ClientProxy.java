@@ -17,6 +17,8 @@
 package p455w0rd.biomestaff.proxy;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -49,6 +51,16 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void updateChunkRendering(int x, int z) {
 		Minecraft.getMinecraft().renderGlobal.markBlockRangeForRenderUpdate(x, 0, z, x, 255, z);
+	}
+
+	@Override
+	public World getWorld() {
+		return Minecraft.getMinecraft().world;
+	}
+
+	@Override
+	public EntityPlayer getPlayer() {
+		return Minecraft.getMinecraft().player;
 	}
 
 }

@@ -83,7 +83,7 @@ public class ItemModelWrapper implements IBakedModel {
 
 	@Override
 	public Pair<? extends IBakedModel, Matrix4f> handlePerspective(TransformType type) {
-		BiomeStaffItemRenderer.setTransformType(type);
+		BiomeStaffItemRenderer.transformType = type;
 		return Pair.of(this, internal.handlePerspective(type).getRight());
 	}
 

@@ -42,10 +42,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import p455w0rd.biomestaff.client.model.ItemModelWrapper;
 import p455w0rd.biomestaff.client.model.ModelBiomeStaff;
+import p455w0rd.biomestaff.init.ModConfig.Options;
 import p455w0rd.biomestaff.init.ModGlobals;
 import p455w0rd.biomestaff.util.BiomeStaffUtil;
 
@@ -56,8 +56,8 @@ import p455w0rd.biomestaff.util.BiomeStaffUtil;
 public class BiomeStaffItemRenderer extends TileEntityItemStackRenderer {
 
 	ModelBiomeStaff staffModel = new ModelBiomeStaff();
-	private static ItemModelWrapper wrapperModel;
-	private static TransformType transformType = TransformType.NONE;
+	public static ItemModelWrapper wrapperModel;
+	public static TransformType transformType = TransformType.NONE;
 
 	@Override
 	public void renderByItem(ItemStack stack, float partialTicks) {
@@ -70,11 +70,31 @@ public class BiomeStaffItemRenderer extends TileEntityItemStackRenderer {
 
 		RenderHelper.enableStandardItemLighting();
 		GlStateManager.rotate(180.0F, 1.0f, 0.0f, 0f);
-		GlStateManager.translate(0.5, -0.5F, -0.5F);
-
+		GlStateManager.translate(0.45, -0.5F, -0.5F);
 		textureManager.bindTexture(new ResourceLocation(ModGlobals.MODID, "textures/models/biome_staff.png"));
 		GlStateManager.scale(1.0F, 1.5f, 1.0F);
+
+		switch (transformType) {
+		case GROUND:
+			GlStateManager.translate(0, -0.85f, 0);
+			break;
+		case FIXED:
+		case GUI:
+			GlStateManager.rotate(45f, 0f, 1.0f, 1.0f);
+			GlStateManager.scale(0.5f, 0.5f, 0.5f);
+			GlStateManager.translate(0, -0.5f, 0);
+			break;
+		case THIRD_PERSON_LEFT_HAND:
+		case THIRD_PERSON_RIGHT_HAND:
+			GlStateManager.translate(0, -0.25, 0);
+			break;
+		default:
+			GlStateManager.rotate(45.0f, 0f, 1f, 0f);
+			break;
+		}
+
 		staffModel.render(player, player.getSwingProgress(partialTicks), 0f, 0f, player.rotationYaw, player.rotationPitch, 0.0625F);
+
 		GlStateManager.scale(1.0F, 0.75f, 1.0F);
 
 		ItemStack topBlockStack = BiomeStaffUtil.getItemTopBlockStack(stack);
@@ -82,15 +102,39 @@ public class BiomeStaffItemRenderer extends TileEntityItemStackRenderer {
 
 			GlStateManager.translate(0.0625F, -0.25F, 0);
 			GlStateManager.rotate(-180.0F, 1.0f, 0.0f, 0f);
-			GlStateManager.scale(0.25F, 0.25F, 0.25F);
+			if (Options.rotateBiomeBlockVertical) {
+				GlStateManager.rotate(ModGlobals.staffAnimationTicker, 0, 0, 1.0f);
+			}
+			if (Options.rotateBiomeBlockHorizontal) {
+				GlStateManager.rotate(ModGlobals.staffAnimationTicker, 0, 1.0f, 0);
+			}
+			switch (transformType) {
+			case FIRST_PERSON_LEFT_HAND:
+			case FIRST_PERSON_RIGHT_HAND:
+				GlStateManager.scale(0.25F, 0.25F, 0.25F);
+				break;
+			case GROUND:
+				GlStateManager.scale(0.25F, 0.25F, 0.25F);
+				break;
+			case FIXED:
+			case GUI:
+				GlStateManager.scale(0.25F, 0.25F, 0.25F);
+				break;
+			case THIRD_PERSON_LEFT_HAND:
+			case THIRD_PERSON_RIGHT_HAND:
+				GlStateManager.scale(0.25F, 0.25F, 0.25F);
+				break;
+			default:
+				break;
+			}
 
 			IBakedModel bakedmodel = mc.getRenderItem().getItemModelMesher().getItemModel(topBlockStack);
-			bakedmodel.getOverrides().handleItemState(bakedmodel, topBlockStack, mc.world, player);
+			//bakedmodel.getOverrides().handleItemState(bakedmodel, topBlockStack, mc.world, player);
 			textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 			textureManager.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
 			GlStateManager.enableBlend();
 			GlStateManager.pushMatrix();
-			bakedmodel = ForgeHooksClient.handleCameraTransforms(bakedmodel, transformType, false);
+			//bakedmodel = ForgeHooksClient.handleCameraTransforms(bakedmodel, transformType, false);
 
 			if (!topBlockStack.isEmpty()) {
 				GlStateManager.pushMatrix();
@@ -116,7 +160,7 @@ public class BiomeStaffItemRenderer extends TileEntityItemStackRenderer {
 								if (EntityRenderer.anaglyphEnable) {
 									k = TextureUtil.anaglyphColor(k);
 								}
-								//k = k | -16777216;
+								k = k | -16777216;
 							}
 							LightUtil.renderQuadColor(bufferbuilder, bakedquad, k);
 						}
@@ -140,34 +184,6 @@ public class BiomeStaffItemRenderer extends TileEntityItemStackRenderer {
 					tessellator.draw();
 					if (topBlockStack.hasEffect()) {
 
-						/*
-						GlStateManager.depthMask(false);
-						GlStateManager.depthFunc(514);
-						GlStateManager.disableLighting();
-						GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_COLOR, GlStateManager.DestFactor.ONE);
-						textureManager.bindTexture(RES_ITEM_GLINT);
-						GlStateManager.matrixMode(5890);
-						GlStateManager.pushMatrix();
-						GlStateManager.scale(8.0F, 8.0F, 8.0F);
-						float f = (float)(Minecraft.getSystemTime() % 3000L) / 3000.0F / 8.0F;
-						GlStateManager.translate(f, 0.0F, 0.0F);
-						GlStateManager.rotate(-50.0F, 0.0F, 0.0F, 1.0F);
-						this.renderModel(model, -8372020);
-						GlStateManager.popMatrix();
-						GlStateManager.pushMatrix();
-						GlStateManager.scale(8.0F, 8.0F, 8.0F);
-						float f1 = (float)(Minecraft.getSystemTime() % 4873L) / 4873.0F / 8.0F;
-						GlStateManager.translate(-f1, 0.0F, 0.0F);
-						GlStateManager.rotate(10.0F, 0.0F, 0.0F, 1.0F);
-						this.renderModel(model, -8372020);
-						GlStateManager.popMatrix();
-						GlStateManager.matrixMode(5888);
-						GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-						GlStateManager.enableLighting();
-						GlStateManager.depthFunc(515);
-						GlStateManager.depthMask(true);
-						this.textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-						*/
 					}
 				}
 
@@ -180,22 +196,6 @@ public class BiomeStaffItemRenderer extends TileEntityItemStackRenderer {
 			textureManager.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
 		}
 		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, pbx, pby);
-	}
-
-	public static void setTransformType(TransformType transformType) {
-		BiomeStaffItemRenderer.transformType = transformType;
-	}
-
-	public static TransformType getTransformType() {
-		return BiomeStaffItemRenderer.transformType;
-	}
-
-	public static void setWrapperModel(ItemModelWrapper wrapperModel) {
-		BiomeStaffItemRenderer.wrapperModel = wrapperModel;
-	}
-
-	public static ItemModelWrapper getWrapperModel() {
-		return wrapperModel;
 	}
 
 	public static class RenderModel {

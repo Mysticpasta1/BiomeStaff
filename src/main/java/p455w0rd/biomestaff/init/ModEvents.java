@@ -22,8 +22,10 @@ import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.biomestaff.client.model.ItemModelWrapper;
@@ -40,7 +42,8 @@ public class ModEvents {
 	@SideOnly(Side.CLIENT)
 	public static void onModelBake(ModelBakeEvent event) {
 		IBakedModel biomeStaffModel = event.getModelRegistry().getObject(new ModelResourceLocation(ModItems.BIOME_STAFF.getRegistryName(), "inventory"));
-		BiomeStaffItemRenderer.setWrapperModel(new ItemModelWrapper(biomeStaffModel));
+		BiomeStaffItemRenderer.wrapperModel = new ItemModelWrapper(biomeStaffModel);
+		event.getModelRegistry().putObject(new ModelResourceLocation(ModItems.BIOME_STAFF.getRegistryName(), "inventory"), BiomeStaffItemRenderer.wrapperModel);
 	}
 
 	@SubscribeEvent
@@ -49,6 +52,23 @@ public class ModEvents {
 		ModItems.BIOME_STAFF.initModel();
 		ModItems.BIOME_STAFF.setTileEntityItemStackRenderer(new BiomeStaffItemRenderer());
 
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public static void onClientTick(ClientTickEvent event) {
+		ModGlobals.staffAnimationTicker++;
+		if (ModGlobals.staffAnimationTicker >= 360) {
+			ModGlobals.staffAnimationTicker = -180;
+		}
+	}
+
+	@SubscribeEvent
+	public static void onConfigChanged(ConfigChangedEvent event) {
+		if (event.getModID().equals(ModGlobals.MODID)) {
+			ModConfig.getConfig().save();
+			ModConfig.init();
+		}
 	}
 
 	@SubscribeEvent
