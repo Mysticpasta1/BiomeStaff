@@ -65,20 +65,18 @@ dependencies {
 	deobfCompile "cofh:RedstoneFlux:1.12-2.0.1.2:universal"
 }
 
-task apiJar(type: Jar) {
-	classifier = 'api'
-	from sourceSets.api.output
-	from sourceSets.api.allJava
+task deobfJar(type: Jar) { // Generate deobfuscated
+    from sourceSets.main.output
+    classifier = 'deobf'
 }
-
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allJava
+task sourcesJar(type: Jar) { // Generate sources
+    from sourceSets.main.allSource
     classifier = 'sources'
 }
 
 artifacts {
-	//archives apiJar
-	//archives sourcesJar
+	archives deobfJar
+	archives sourcesJar
 }
 
 uploadArchives {
