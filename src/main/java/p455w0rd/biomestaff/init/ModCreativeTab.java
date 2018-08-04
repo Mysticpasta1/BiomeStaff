@@ -16,32 +16,23 @@
  */
 package p455w0rd.biomestaff.init;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.google.common.collect.Lists;
-
-import net.minecraft.item.Item;
-import p455w0rd.biomestaff.item.ItemBiomeStaff;
-import p455w0rd.biomestaff.item.ItemObsidianShaft;
-import p455w0rd.biomestaff.item.ItemTopPlate;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemStack;
 
 /**
  * @author p455w0rd
  *
  */
-public class ModItems {
+public class ModCreativeTab extends CreativeTabs {
 
-	public static final List<Item> ITEM_LIST = new ArrayList<>();
+	public static final CreativeTabs MAIN_TAB = new ModCreativeTab();
 
-	public static final ItemBiomeStaff BIOME_STAFF = new ItemBiomeStaff();
-	public static final ItemObsidianShaft OBSIDIAN_SHAFT = new ItemObsidianShaft();
-	public static final ItemTopPlate TOP_PLATE = new ItemTopPlate();
-
-	static {
-
-		ITEM_LIST.addAll(Lists.newArrayList(BIOME_STAFF, OBSIDIAN_SHAFT, TOP_PLATE));
-
+	public ModCreativeTab() {
+		super(ModGlobals.MODID);
 	}
 
+	@Override
+	public ItemStack getTabIconItem() {
+		return new ItemStack(ModItems.BIOME_STAFF);
+	}
 }

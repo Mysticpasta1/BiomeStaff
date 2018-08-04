@@ -77,8 +77,8 @@ task sourcesJar(type: Jar) {
 }
 
 artifacts {
-	archives apiJar
-	archives sourcesJar
+	//archives apiJar
+	//archives sourcesJar
 }
 
 uploadArchives {

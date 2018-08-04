@@ -1,0 +1,26 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"a",
+		"b",
+		"c"
+	],
+	"key": {
+		"c": {
+			"type": "forge:ore_dict",
+			"ore": "ingotGold"
+		},
+		"b": {
+			"item": "biomestaff:obsidian_shaft",
+			"data": 0
+		},
+		"a": {
+			"item": "biomestaff:top_plate",
+			"data": 0
+		}
+	},
+	"result": {
+		"item": "biomestaff:biome_staff",
+		"data": 0
+	}
+}

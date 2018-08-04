@@ -14,34 +14,21 @@
  * Staff Mod Crafting Terminal. If not, see
  * <https://opensource.org/licenses/MIT>.
  */
-package p455w0rd.biomestaff.init;
+package p455w0rd.biomestaff.item;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.google.common.collect.Lists;
-
-import net.minecraft.item.Item;
-import p455w0rd.biomestaff.item.ItemBiomeStaff;
-import p455w0rd.biomestaff.item.ItemObsidianShaft;
-import p455w0rd.biomestaff.item.ItemTopPlate;
+import net.minecraft.util.ResourceLocation;
+import p455w0rd.biomestaff.init.ModGlobals;
 
 /**
  * @author p455w0rd
  *
  */
-public class ModItems {
+public class ItemObsidianShaft extends ItemBase {
 
-	public static final List<Item> ITEM_LIST = new ArrayList<>();
+	private static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModGlobals.MODID, "obsidian_shaft");
 
-	public static final ItemBiomeStaff BIOME_STAFF = new ItemBiomeStaff();
-	public static final ItemObsidianShaft OBSIDIAN_SHAFT = new ItemObsidianShaft();
-	public static final ItemTopPlate TOP_PLATE = new ItemTopPlate();
-
-	static {
-
-		ITEM_LIST.addAll(Lists.newArrayList(BIOME_STAFF, OBSIDIAN_SHAFT, TOP_PLATE));
-
+	public ItemObsidianShaft() {
+		super(REGISTRY_NAME);
 	}
 
 }

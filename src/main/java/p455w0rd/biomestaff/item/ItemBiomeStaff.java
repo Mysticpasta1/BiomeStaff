@@ -16,12 +16,7 @@
  */
 package p455w0rd.biomestaff.item;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -43,6 +38,8 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import p455w0rd.biomestaff.client.model.IModelProvider;
+import p455w0rd.biomestaff.init.ModCreativeTab;
 import p455w0rd.biomestaff.init.ModGlobals;
 import p455w0rd.biomestaff.init.ModNetworking;
 import p455w0rd.biomestaff.network.PacketSyncBiomeStaff;
@@ -53,17 +50,17 @@ import p455w0rd.biomestaff.util.BiomeStaffUtil;
  * @author p455w0rd
  *
  */
-public class ItemBiomeStaff extends Item {
+public class ItemBiomeStaff extends Item implements IModelProvider {
 
 	public static final String TAG_BIOME = "biome";
 
 	private static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ModGlobals.MODID, "biome_staff");
 
 	public ItemBiomeStaff() {
-		setUnlocalizedName(REGISTRY_NAME.getResourcePath().toString());
+		setUnlocalizedName(REGISTRY_NAME.toString());
 		setRegistryName(REGISTRY_NAME);
 		setHasSubtypes(true);
-		setCreativeTab(CreativeTabs.TOOLS);
+		setCreativeTab(ModCreativeTab.MAIN_TAB);
 	}
 
 	@Override
@@ -136,17 +133,6 @@ public class ItemBiomeStaff extends Item {
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-		if (stack.hasTagCompound() && stack.getTagCompound().hasKey(TAG_BIOME, Constants.NBT.TAG_BYTE)) {
-			Biome biome = Biome.getBiome(stack.getTagCompound().getByte(TAG_BIOME) & 255);
-			if (biome != null) {
-				tooltip.add("Biome: " + biome.getBiomeName());
-			}
-		}
-	}
-
-	@Override
 	public boolean showDurabilityBar(ItemStack stack) {
 		return false;
 	}
@@ -170,6 +156,7 @@ public class ItemBiomeStaff extends Item {
 		return I18n.translateToLocal(stack.getItem().getUnlocalizedName() + ".name").trim() + "" + biomeName;
 	}
 
+	@Override
 	@SideOnly(Side.CLIENT)
 	public void initModel() {
 		ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(REGISTRY_NAME, "inventory"));

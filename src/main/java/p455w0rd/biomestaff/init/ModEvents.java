@@ -28,6 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import p455w0rd.biomestaff.client.model.IModelProvider;
 import p455w0rd.biomestaff.client.model.ItemModelWrapper;
 import p455w0rd.biomestaff.client.render.BiomeStaffItemRenderer;
 
@@ -49,9 +50,12 @@ public class ModEvents {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public static void onModelRegistryReady(ModelRegistryEvent event) {
-		ModItems.BIOME_STAFF.initModel();
+		for (Item item : ModItems.ITEM_LIST) {
+			if (item instanceof IModelProvider) {
+				((IModelProvider) item).initModel();
+			}
+		}
 		ModItems.BIOME_STAFF.setTileEntityItemStackRenderer(new BiomeStaffItemRenderer());
-
 	}
 
 	@SubscribeEvent
@@ -73,7 +77,9 @@ public class ModEvents {
 
 	@SubscribeEvent
 	public static void onItemRegistryReady(RegistryEvent.Register<Item> event) {
-		event.getRegistry().register(ModItems.BIOME_STAFF);
+		for (Item item : ModItems.ITEM_LIST) {
+			event.getRegistry().register(item);
+		}
 	}
 
 }

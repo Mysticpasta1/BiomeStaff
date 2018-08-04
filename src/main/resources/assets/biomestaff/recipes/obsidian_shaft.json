@@ -1,0 +1,17 @@
+{
+	"type": "forge:ore_shaped",
+	"pattern": [
+		"a",
+		"a"
+	],
+	"key": {
+		"a": {
+			"type": "forge:ore_dict",
+			"ore": "blockObsidian"
+		}
+	},
+	"result": {
+		"item": "biomestaff:obsidian_shaft",
+		"count": 3
+	}
+}
