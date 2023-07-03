@@ -1,170 +1,146 @@
-buildscript {
-	repositories {
-		jcenter()
-		maven {
-			name = "forge"
-			url = "http://files.minecraftforge.net/maven"
-		}
-	}
-	dependencies {
-		classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
-	}
+plugins {
+	id 'net.minecraftforge.gradle' version '5.1.+'
+	id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+	id 'org.spongepowered.mixin' version '0.7.+'
+	id 'eclipse'
+	id 'maven-publish'
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'maven'
+archivesBaseName = project.archives_base_name
+version = project.mod_version
+group = project.maven_group
 
-version = "1.12.2-" + getVersion()
-group = "p455w0rd"
-archivesBaseName = "BiomeStaff"
-sourceCompatibility = targetCompatibility = "1.8"
+// JENKINS STUFF! LEAVE THIS ALONE!
+if (System.getenv('BUILD_NUMBER') != null) {
+	version = "${version}." + System.getenv('BUILD_NUMBER')
+}
 
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-	version = "1.12.2-14.23.4.2739"
-	
-	runDir = "run"
-	mappings = "snapshot_20171003"
-	useDepAts = true
-}
+	mappings channel: project.mappings, version: project.mappings_version
 
-repositories {
-	
-	maven {
-		name = "progwml6"
-		url = "http://dvs1.progwml6.com/files/maven"
-	}
-	maven {
-		name = "tterrag"
-		url = "http://maven.tterrag.com"
-	}
-	maven {
-		url "http://mobiusstrip.eu/maven"
-	}
-	maven {
-		 name = "epoxide"
-		 url = "http://maven.epoxide.xyz"
-	 }
-	 maven {
-		name = "tehnut"
-		url = "http://tehnut.info/maven"
-	}
-	maven {
-        name = "covers Maven"
-        url = "http://maven.covers1624.net"
-    }
-}
-dependencies {
-	deobfCompile "mezz.jei:jei_1.12.2:+"
-	//compile project(':appliedenergistics2')
-	//deobfCompile "com.enderio:EnderIO:1.10.2-3.0.1.112_beta"
-	//deobfCompile "com.enderio.core:EnderCore:1.10.2-0.4.1.55-beta"
-	//deobfCompile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
-	deobfCompile "net.darkhax.tesla:Tesla-1.12:1.0.61"
-	deobfCompile "mcp.mobius.waila:Hwyla:1.8.20-B35_1.12"
-	deobfCompile "appeng:appliedenergistics2:rv6-alpha-3"
-	deobfCompile "cofh:RedstoneFlux:1.12-2.0.1.2:universal"
-}
+	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
-task deobfJar(type: Jar) { // Generate deobfuscated
-    from sourceSets.main.output
-    classifier = 'deobf'
-}
-task sourcesJar(type: Jar) { // Generate sources
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
+	runs {
+		client {
+			workingDirectory project.file('run')
 
-artifacts {
-	archives deobfJar
-	archives sourcesJar
-}
+			property 'forge.logging.markers', 'REGISTRIES'
+			property 'forge.logging.console.level', 'debug'
+			property 'forge.enabledGameTestNamespaces', 'examplemod'
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            if (project.hasProperty("local_maven") || (project.hasProperty("maven_user") && project.hasProperty("maven_pass"))) {
-				if (project.hasProperty("maven_pass")) {
-					println "Uploading to remote maven."
-					repository(url: "http://maven_upload.covers1624.net/") {
-						authentication(userName: project.getProperty("maven_user"), password: project.getProperty("maven_pass"))
-					}
-				} else {
-					println "Uploading to local maven."
-					repository(url: "file://${local_maven}/.m2/repository")
+			arg "-mixin.config=biomestaff.mixins.json"
+			property 'mixin.env.remapRefMap', 'true'
+			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+
+			mods {
+				biomestaff {
+					source sourceSets.main
 				}
-                pom {
-                    groupId = project.group
-                    // Force the maven upload to use the <mcversion>-<version> syntax preferred at files
-                    artifactId = project.archivesBaseName
-                    project {
-                        name project.archivesBaseName
-                        packaging 'jar'
-                        description 'BiomeStaff'
-                        url 'https://github.com/p455w0rd/BiomeStaff'
+			}
+		}
 
-                        scm {
-                            url 'https://github.com/p455w0rd/BiomeStaff'
-                            connection 'scm:git:git://github.com/p455w0rd/BiomeStaff.git'
-                            developerConnection 'scm:git:git@github.com:p455w0rd/BiomeStaff.git'
-                        }
+		server {
+			workingDirectory project.file('run')
 
-                        issueManagement {
-                            system 'github'
-                            url 'https://github.com/p455w0rd/BiomeStaff/issues'
-                        }
+			property 'forge.logging.markers', 'REGISTRIES'
+			property 'forge.logging.console.level', 'debug'
+			property 'forge.enabledGameTestNamespaces', 'examplemod'
 
-                        licenses {
-                            license {
-                                name 'MIT'
-                                url 'https://opensource.org/licenses/MIT'
-                                distribution 'repo'
-                            }
-                        }
+			arg "-mixin.config=biomestaff.mixins.json"
+			property 'mixin.env.remapRefMap', 'true'
+			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
-                        developers {
-                            developer {
-                                id 'TheRealp455w0rd'
-                                name 'Mike Balser'
-                                roles { role 'developer' }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+			mods {
+				biomestaff {
+					source sourceSets.main
+				}
+			}
+		}
 
-processResources {
-	inputs.property "version", project.version
-	inputs.property "mcversion", project.minecraft.version
+		gameTestServer {
+			workingDirectory project.file('run')
 
-	from (sourceSets.main.resources.srcDirs) {
-		include "mcmod.info"
-		expand "version": project.version, "mcversion": project.minecraft.version
-	}
-		
-	from (sourceSets.main.resources.srcDirs) {
-		exclude "mcmod.info"
-	}
-}
+			property 'forge.logging.markers', 'REGISTRIES'
+			property 'forge.logging.console.level', 'debug'
+			property 'forge.enabledGameTestNamespaces', 'examplemod'
 
-String getVersion() {
-	String major = "0";
-	String revision = "0";
-	String patch = "0";
-	String prefix = "public static final String VERSION = \"";
-	File file = file("src/main/java/p455w0rd/biomestaff/init/ModGlobals.java")
-	file.eachLine { String s ->
-		s = s.trim();
-		if (s.startsWith(prefix)) {
-			s = s.substring(prefix.length(), s.length() - 2);
-			String[] pts = s.split("\\.");
+			arg "-mixin.config=biomestaff.mixins.json"
+			property 'mixin.env.remapRefMap', 'true'
+			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
-			major = pts[0];
-			revision = pts[1];
-			patch = pts[2];
+			mods {
+				biomestaff {
+					source sourceSets.main
+				}
+			}
+		}
+
+		data {
+			workingDirectory project.file('run')
+
+			property 'forge.logging.markers', 'REGISTRIES'
+			property 'forge.logging.console.level', 'debug'
+
+			property 'mixin.env.remapRefMap', 'true'
+			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+
+			args '--mod', 'biomestaff', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+
+			mods {
+				biomestaff {
+					source sourceSets.main
+				}
+			}
 		}
 	}
-	return "$major.$revision.$patch";
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+dependencies {
+	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+mixin {
+	add sourceSets.main, "biomestaff.refmap.json"
+	config "biomestaff.mixins.json"
+
+	debug.verbose = true
+}
+
+jar {
+	manifest {
+		attributes([
+				"Specification-Title"     : "biomestaff",
+				"Specification-Vendor"    : "Mysticpasta1",
+				"Specification-Version"   : "1",
+				"Implementation-Title"    : project.name,
+				"Implementation-Version"  : project.jar.archiveVersion,
+				"Implementation-Vendor"   : "Mysticpasta1",
+				"Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+		])
+	}
+}
+
+jar.finalizedBy('reobfJar')
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			artifact jar
+		}
+	}
+	repositories {
+		maven {
+			url "file://${project.projectDir}/mcmodsrepo"
+		}
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
 }
